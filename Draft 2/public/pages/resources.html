@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SG Resources</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="../main2.css" />
+    <script src="../main2.js"></script>
+    <script src="../pitRecorder.js"></script>
+    <script src="../modal.js"></script>
+
+    <!--Below is the broekn Dev API Key.  Comment out this and uncomment the below to get it working-->
+    <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSy9WYYXqj-buWApxZz61dQ&callback=initMap"
+    async defer></script>-->
+    <!-- below is the "good" Dev API Key for Google Maps-->
+
+</head>
+<body>
+    <header>
+        <nav id="nav">
+            <a href="../index2.html" > Home</a>
+            <a href="gearReviews.html">Gear Reviews</a>
+            <a href="#tripReports">Trip Reports</a>
+            <a href="#referenceArea">Reference Articles</a>
+            <a href="resources.html" class="activeLink">Resources</a>
+            <div id="navMenu" >
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+                <div id="navMenuContent">
+                    <div class="dropdown">
+                        <div class="dropdown-content">
+                            <a class="trigger">Login</a>
+                            <a>Preferences</a>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        </nav>
+            <div class="titleWrapper secondary">
+                <h1 class="titleHeader secondary">SweetGear.ca</h1>
+            </div>  
+            <div class="modal">
+                <div class="modal-content logon">
+                    <span id="modalCloseButton" class="close-button">×</span>
+                    <form id="logon">
+                        <label for="username">Username: <input id="username" type="text"></label>
+                        <label for="password">Password: <input id="password" type="text"></label>
+                        <button type="submit">Login</button>
+                        <button type="button" id="newUser">Register</button>
+                    </form>
+                </div>
+            </div>
+    </header>
+    <h1>Snow Geek</h1>
+        <div class="modal" id="mapModalOuter">
+            <div class="modal-content mapModal" id="mapModalInner"><span id="mapModalCloseButton" class="close-button">×</span></div>
+        </div>
+        <div class="modal" id="pitModal">
+            <div class="modal-content pitForm">
+                <span id="pitModalCloseButton" class="close-button">×</span>
+                <form onsubmit="return formSubmit();" id="pitForm">
+                    <fieldset>
+                        <label for="pitName">Name:<input id="pitName" type="text" required></label>
+                        <label for="privateRecord">Check to make record private: <input id="privateRecord" type="checkbox"></label>
+                        <label for="date">Date:<input id="date" type="date" required><input id="time" type="time" required></label>
+                        <label for="location">Location Description:<input id="location" type="text"></label>
+                        <span id="useMap" onsubmit=return false>Select location on map</span>
+                        <label for="lat">Latitude:<input id="lat" type="number" step="any"></label>
+                        <label for="lng">Longitude:<input id="lng" type="number" step="any"></label>
+                        <label for="elevation">Elevation:<input id="elevation" type="number"></label>
+                        <label for="aspect">Aspect:<input id="aspect" type="text"></label>
+                        <label for="temp">Temperature:<input id="temp" type="number"></label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="result1">Result 1:<input id="result1" type="text" value="Result1" hidden></label>
+                        <label for="testType1">Type of Test<select id="testType1">
+                            <option value="None" default>None</option>
+                            <option value="CT">Compression Test</option>
+                            <option value="ECT">Extended Compression Test</option>
+                            <option value="PST">Propagation Saw Test</option>
+                            <option value="SST">Shovel Shear Test</option>
+                        </select></label>
+                        <label for="loadingStage1">Loading Stage:<input type="number" id="loadingStage1"></label>
+                        <label for="fracQual1">Fracture Quality:<select id="fracQual1">
+                            <option value="None" default>None</option>
+                            <option value="SP">Sudden Planar</option>
+                            <option value="SC">Sudden Collaplse</option>
+                            <option value="RP">Reistant Planar</option>
+                            <option value="BK">Break</option>
+                        </select></label>
+                        <label for="depth1">Depth of Failure:<input id="depth1" type="number"></label>
+                        <label for="weakLayer1">Weak Layer:<input type="text" id="weakLayer1"></label>
+                        <label for="notes1">Notes:<textarea id="notes1" type="textarea" maxlength="200"></textarea></label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="includeResult2">Check to include a second test result:<input id="includeResult2" type="checkbox"></label><br>
+                        <label for="result2">Result 2:<input id="result2" type="text" value="Result2" hidden></label>
+                        <label for="testType2">Type of Test<select id="testType2">
+                            <option value="None" default>None</option>
+                            <option value="CT">Compression Test</option>
+                            <option value="ECT">Extended Compression Test</option>
+                            <option value="PST">Propagation Saw Test</option>
+                            <option value="SST">Shovel Shear Test</option>
+                        </select></label>
+                        <label for="loadingStage2">Loading Stage:<input type="number" id="loadingStage2"></label>
+                        <label for="fracQual2">Fracture Quality:<select id="fracQual2">
+                            <option value="None" default>None</option>
+                            <option value="SP">Sudden Planar</option>
+                            <option value="SC">Sudden Collaplse</option>
+                            <option value="RP">Reistant Planar</option>
+                            <option value="BK">Break</option>
+                        </select></label>
+                        <label for="depth2">Depth of Failure:<input id="depth2" type="number"></label>
+                        <label for="weakLayer2">Weak Layer:<input type="text" id="weakLayer2"></label>
+                        <label for="notes2">Notes:<textarea id="notes2" type="textarea" maxlength="200"></textarea></label>
+                    </fieldset><br>
+                    <button>Submit</button>
+                </form><br>
+            </div>
+        </div> 
+    <div id="map"></div>
+    <button id="pitTrigger">Add new Pit Record</button>
+    <button onclick="pm.loadFromServer();">Load From Server</button>
+    <button onclick="pm.saveSingleRecordToServer();">Save To Server</button>
+    <div id="tableDiv"></div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDumIbyFT5ySDy9WYYXqj-buWApxZz61dQ"
+async defer></script>
+<script src="../map.js"></script>
+</body>
+</html>
