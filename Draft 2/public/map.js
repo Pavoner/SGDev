@@ -1,4 +1,4 @@
-window.addEventListener('load', initMap)
+
 var map, modalMap, infoWindow;
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
@@ -11,7 +11,7 @@ function initMap() {
       console.log(e.latLng.lat())
       console.log(e.latLng.lng())
   });
-
+    
   modalMap = new google.maps.Map(document.getElementById('mapModalInner'), {
     center: {lat: 51.5, lng: -115.0},
     zoom: 8,

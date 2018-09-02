@@ -2,6 +2,9 @@ const validator = require('./validation')
 const mongodb = require('mongodb')
 const coll = 'dev'
 
+let pitsPropArray = ['user', 'privateRecord', 'pitName', 'date', 'time', 'location', 'lat', 'lng', 'elevation', 'aspect', 'temp', 'result1', 'result2', 'result3', 'result4', 'result5']
+let resultsPropArray=['resultNumber', 'testType', 'loadingStage', 'fracQual', 'depth', 'weakLayer', 'notes']
+
 module.exports = {
 
     getPits(req, res) {
@@ -28,14 +31,13 @@ module.exports = {
 
     addPit(req, res) {
       console.log('Payload: ' + JSON.stringify(req.body))
-      let safeObj = validator.addPitValidation(JSON.stringify(req.body))
+      let safeObj = validator.postValidation(JSON.stringify(req.body), pitsPropArray, resultsPropArray)
       console.log(safeObj)
       if (safeObj !== null){
         req.db.collection(coll).insert(safeObj, (error, result) => {
           if (error) return process.exit(1)
           console.log('\nValidation passed, post added with ID: ' + safeObj._id)
-          //console.log('\nValidation passed, post added.') 
-          return res.status(201).send(result.name + ' added with ID# ' + safeObj._id)}
+          return res.status(201).send(result.ops[0].pitName + ' added with ID# ' + safeObj._id)}
         )}
       else {
         console.log('\nValidation failed, post not added.') 
@@ -44,7 +46,7 @@ module.exports = {
   },
     updatePit(req, res) {
       //console.log(req.params.pitId)
-      let safeObj = validator.addPitValidation(JSON.stringify(req.body))
+      let safeObj = validator.postValidation(JSON.stringify(req.body))
       if (safeObj!==null) {
         req.db.collection(coll).update({ _id : mongodb.ObjectID(req.params.pitId) }, safeObj, (error, result) => {
         if (error) return process.exit(1)        

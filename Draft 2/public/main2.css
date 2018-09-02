@@ -247,6 +247,7 @@ table, td {
 
 #map {
     height: 50vh;
+    min-height: 500px;
     width: 70vw;
     
 }

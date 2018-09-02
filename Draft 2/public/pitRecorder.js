@@ -42,27 +42,20 @@ function formSubmit(){
         let depth2 = document.querySelector('#depth2');
         let weakLayer2 = document.querySelector('#weakLayer2');
         let notes2 = document.querySelector('#notes2');
-        result2 = new TestResult(resultNumber2, testType2.value, loadingStage2.value, fracQual2.value, depth2.value, weakLayer2.value, notes2.value);
+        result2 = new TestResult(resultNumber2, testType2.value, loadingStage2.valueAsNumber, fracQual2.value, depth2.valueAsNumber, weakLayer2.value,notes2.value);
         console.log(result2);
     }
 
-    let newRecord = new PitRecord(user, privateRecord.checked, pitName.value, date.value, time.value, location.value, lat.valueAsNumber, lng.valueAsNumber, elevation.value, aspect.value, temp.value, new TestResult(resultNumber1, testType1.value, loadingStage1.value, fracQual1.value, depth1.value, weakLayer1.value, notes1.value), result2, result3, result4, result5);
+    
+
+    let newRecord = new PitRecord(user, privateRecord.checked, pitName.value, date.value, time.value, location.value, lat.valueAsNumber, lng.valueAsNumber, elevation.valueAsNumber, aspect.value, temp.valueAsNumber, new TestResult(resultNumber1, testType1.value, loadingStage1.valueAsNumber, fracQual1.value, depth1.valueAsNumber, weakLayer1.value, notes1.value), result2, result3, result4, result5);
     console.log(newRecord);
+
     pm.add(newRecord);
 
-    pm.displayPitRecordsInTable("tableDiv");
+    //pm.displayPitRecordsInTable("tableDiv");
     //document.getElementById('pitForm').reset();
     return false;
-}
-
-function emptyList() {
-	pm.clear();
-  	pm.displayPitRecordsInTable("tableDiv");
-}
-
-function loadList() {
-	pm.load();
-  	pm.displayPitRecordsInTable("tableDiv");
 }
 
 class TestResult {
@@ -107,66 +100,9 @@ class PitRecordManager {
         this.pitList = [];
     }
 
-    load () {
-        if(localStorage.pitList !== undefined) {
-            this.pitList = JSON.parse(localStorage.pitList);
-        }
-    }
-
     add(pitRecord){
-        this.pitList.push(pitRecord);
+        //this.pitList.push(pitRecord);
         this.saveSingleRecordToServer(pitRecord)
-    }
-    
-    remove(pitRecord){
-        for (let i=0; i < this.pitList.length; i++){
-            var p  =this.pitList[i];
-            if (p.name === pitRecord.name){
-                this.pitList.splice(i,i);
-                break;
-            }
-        };
-    }
-
-    sort(){
-        this.pitList.sort(PitRecordManager.sortByName);
-        console.log(this.pitList);
-        this.displayPitRecordsInTable('tableDiv');
-    }
-
-    static sortByName(p1, p2) {
-
-        if(p1.pitName < p2.pitName)
-        return -1;
-
-        if (p1.pitName > p2.pitName)
-        return 1;
-
-        else return 0;
-    }
-
-    save(){
-        if(this.pitList.length !== 0){
-        localStorage.pitList = JSON.stringify(this.pitList);
-        alert('List of Snow Pits has been updated!');
-        } else {
-            alert('Whoops no pit records to store...');
-        }
-    }
-
-    saveToServer(){
-        if(this.pitList.length !== 0){
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "http://localhost:3000", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(JSON.stringify(this.pitList));
-            xhr.onload = function() {
-            console.log("XHR OnLoad Init")
-            console.log(this.responseText);}
-        }
-         else {
-            alert('Whoops no pit records to store...');
-        }
     }
 
     saveSingleRecordToServer(pitRecord){
@@ -179,7 +115,9 @@ class PitRecordManager {
             xhr.send(JSON.stringify(pitRecord));
 
             xhr.onload = function() {
-            console.log(this.responseText);}
+            console.log(this.responseText);
+            pm.loadFromServer();
+            }
         }
          else {
             alert('Whoops no pit record to store...');
@@ -203,13 +141,7 @@ class PitRecordManager {
         pm.displayPitRecordsInMap();
         } else console.log('resp = undefined')
     }}
-
-    printPitRecordsToConsole () {
-        this.pitList.forEach(function (pit){
-            console.log(pit.name);
-        });
-    }
-
+    
     displayPitRecordsInTable(idOfContainer){
         let container = document.querySelector("#" + idOfContainer);
         container.innerHTML="";
@@ -225,7 +157,7 @@ class PitRecordManager {
             
             let row = table.insertRow();
             
-            row.innerHTML = "<td>" + currentPit.pitName + "</td> <td>" + currentPit.date + "</td><td>" + currentPit.time + "</td><td>" + currentPit.location + "</td><td>" + 
+            row.innerHTML = "<td id="+currentPit._id+" class="+"pitName"+">" + currentPit.pitName + "</td> <td>" + currentPit.date + "</td><td>" + currentPit.time + "</td><td>" + currentPit.location + "</td><td>" + 
             currentPit.elevation + "</td><td>" + currentPit.aspect + "</td> <td>" + currentPit.temp + "</td><td>"+ currentPit.result1.resultNumber + "</td> <td>" +
             currentPit.result1.testType + "</td><td>"+ currentPit.result1.loadingStage + "</td><td>" + currentPit.result1.fracQual + "</td> <td>" + 
             currentPit.result1.depth + "</td><td>" + currentPit.result1.weakLayer + "</td><td>" + currentPit.result1.notes + "</td>";
@@ -244,7 +176,7 @@ class PitRecordManager {
     }
 
     displayPitRecordsInMap(){
-        var contentArray = ['Test Content'];
+        var contentString = 'Test Content';
         if (this.pitList.length === 0) {
             container.innerHTML="<p>WHOOPS!!!  No Snow Pits In Record. Please add pit records then try again.</p>";
             return;
@@ -263,6 +195,16 @@ class PitRecordManager {
                 position: {lat: pitPositions[i].lat, lng: pitPositions[i].lng},
                 map: map,
                 title: pitPositions.name,
+                icon: {
+                    anchor: new google.maps.Point(12.4, 22.5),
+                    path: "M12 2C8.14 2 5 5.14 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm-1.56 10H9v-1.44l3.35-3.34 1.43 1.43L10.44 12zm4.45-4.45l-.7.7-1.44-1.44.7-.7c.15-.15.39-.15.54 0l.9.9c.15.15.15.39 0 .54z",
+                    scale: 2,
+                    strokeColor: "#365E86",
+                    fillColor: "#CEAF49",
+                    fillOpacity: 1
+                }
+
+
             });
             markers[i].pitName = pitPositions[i].pitName;
             markers[i]._id = pitPositions[i]._id;
@@ -272,7 +214,7 @@ class PitRecordManager {
         }
 
         var infoWindow = new google.maps.InfoWindow({
-            content: contentArray[0]
+            content: contentString
           });
         
         let avgLat, avgLng;
@@ -292,11 +234,87 @@ class PitRecordManager {
 
         markers.forEach(function (currentMarker){
             currentMarker.addListener('click', function(){
-                contentArray.push('<div id=infoWindow><p> Pit ID: ' + currentMarker._id + '<br> Pit Name: ' + currentMarker.pitName + '<br> Pit Date: ' + currentMarker.date + ' <br> Pit Location: ' + currentMarker.location + ' <p></div>');
+                contentString = '<div id=infoWindow><p> Pit ID: ' + currentMarker._id + '<br> Pit Name: ' + currentMarker.pitName + '<br> Pit Date: ' + currentMarker.date + ' <br> Pit Location: ' + currentMarker.location + ' <p></div>';
                 infoWindow.open(map, currentMarker);
-                infoWindow.setContent(contentArray[currentMarker.index + 1]);
+                infoWindow.setContent(contentString);
             })
         })
 
+        var markerCluster = new MarkerClusterer(map, markers,
+            {imagePath: '../markerImages/m'});
     }
 }
+
+/*function emptyList() {
+	pm.clear();
+  	pm.displayPitRecordsInTable("tableDiv");
+} */
+
+/*function loadList() {
+	pm.load();
+  	pm.displayPitRecordsInTable("tableDiv");
+} */
+
+/*
+load () {
+    if(localStorage.pitList !== undefined) {
+        this.pitList = JSON.parse(localStorage.pitList);
+    }
+} */
+   /* remove(pitRecord){
+        for (let i=0; i < this.pitList.length; i++){
+            var p  =this.pitList[i];
+            if (p.name === pitRecord.name){
+                this.pitList.splice(i,i);
+                break;
+            }
+        };
+    } */
+
+   /* sort(){
+        this.pitList.sort(PitRecordManager.sortByName);
+        console.log(this.pitList);
+        this.displayPitRecordsInTable('tableDiv');
+    } */
+
+   /* static sortByName(p1, p2) {
+
+        if(p1.pitName < p2.pitName)
+        return -1;
+
+        if (p1.pitName > p2.pitName)
+        return 1;
+
+        else return 0;
+    }*/
+
+   /* save(){
+        if(this.pitList.length !== 0){
+        localStorage.pitList = JSON.stringify(this.pitList);
+        alert('List of Snow Pits has been updated!');
+        } else {
+            alert('Whoops no pit records to store...');
+        }
+    } */
+
+  /*  saveToServer(){
+        if(this.pitList.length !== 0){
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:3000", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(this.pitList));
+            xhr.onload = function() {
+            console.log("XHR OnLoad Init")
+            console.log(this.responseText);}
+        }
+         else {
+            alert('Whoops no pit records to store...');
+        }
+    } */
+
+   /* printPitRecordsToConsole () {
+        this.pitList.forEach(function (pit){
+            console.log(pit.name);
+        });
+    }*/
+
